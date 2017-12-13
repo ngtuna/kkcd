@@ -4,7 +4,7 @@
 from kubernetes import client, config, watch
 import logging
 
-class App(object):
+class Ingress(object):
     def __init__(self, obj):
         self._obj = obj
         self._apiversion = obj.api_version
@@ -21,13 +21,16 @@ def main():
 
     ext_beta1 = client.ExtensionsV1beta1Api()
 
-    def process_meta(t, app):
+    def process_meta(t, ing):
         if t == "DELETED":
-            logging.warning("ingress %s has been deleted", app.ing_name())
+            logging.warning("ingress %s has been deleted", ing.ing_name())
+            # process_delete(ing)
         elif t == "MODIFIED":
-            logging.warning("ingress %s has been updated", app.ing_name())
+            logging.warning("ingress %s has been updated", ing.ing_name())
+            # process_update(ing)
         elif t == "ADDED":
-            logging.warning("ingress %s has been created", app.ing_name())
+            logging.warning("ingress %s has been created", ing.ing_name())
+            # process_add(ing)
         else:
             logging.error("Unrecognized type: %s", t)
 
@@ -40,8 +43,8 @@ def main():
                 t = event["type"]
                 obj = event["object"]
                 print obj
-                app = App(obj)
-                process_meta(t, app)
+                ing = Ingress(obj)
+                process_meta(t, ing)
 
                 # Configure where to resume streaming.
                 metadata = obj.metadata
