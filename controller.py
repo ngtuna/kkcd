@@ -15,6 +15,9 @@ class Ingress(object):
     def ing_name(self):
         return self._metadata.name
 
+    def ing_route(self):
+        return self._spec.rules[0].host
+
 def main():
     # config.load_incluster_config()
     config.load_kube_config()
@@ -26,10 +29,10 @@ def main():
             logging.warning("ingress %s has been deleted", ing.ing_name())
             # process_delete(ing)
         elif t == "MODIFIED":
-            logging.warning("ingress %s has been updated", ing.ing_name())
+            logging.warning("ingress %s has been updated. Endpoint is %s", ing.ing_name(), ing.ing_route())
             # process_update(ing)
         elif t == "ADDED":
-            logging.warning("ingress %s has been created", ing.ing_name())
+            logging.warning("ingress %s has been created. Endpoint is %s", ing.ing_name(), ing.ing_route())
             # process_add(ing)
         else:
             logging.error("Unrecognized type: %s", t)
